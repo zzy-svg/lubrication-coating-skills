@@ -25,6 +25,12 @@ allowed-tools:
   - mcp__scholar-mcp-server__search
   - mcp__scholar-mcp-server__get_paper_details
   - mcp__scholar-mcp-server__get_citations
+  - mcp__zotero__zotero_search_items
+  - mcp__zotero__zotero_get_item_fulltext
+  - mcp__zotero__zotero_create_item
+  - mcp__pubmed__pubmed_search_articles
+  - mcp__pubmed__pubmed_get_article_details
+  - mcp__pubmed__pubmed_get_fulltext
 ---
 
 # Tribology Coating Literature Review Skill
@@ -87,6 +93,8 @@ Achieved COF of 0.XX and wear rate of X×10^-X mm³/Nm on [substrate].
 |--------|----------|------|-------|
 | ArXiv | Latest materials synthesis, ML in tribology | 最新材料合成、摩擦学机器学习 | `search_papers`, `read_paper` |
 | Google Scholar | Broad coverage, citation tracking | 广泛覆盖、引文追踪 | `scholar-mcp-server` |
+| PubMed | Biomedical, clinical research | 生物医学、临床研究 | `pubmed_search_articles` |
+| Zotero | Personal library, reference management | 个人文献库、参考文献管理 | `zotero_search_items` |
 | Web of Science | High-quality journal articles | 高质量期刊文章 | WebSearch |
 | Specific Journals | Tribology International, Wear, Coatings | 专业期刊直接搜索 | Direct journal search |
 

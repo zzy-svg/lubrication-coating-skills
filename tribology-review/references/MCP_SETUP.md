@@ -12,14 +12,15 @@ This guide provides detailed instructions for setting up and configuring MCP (Mo
 
 | Server | Purpose | Priority | Status |
 |--------|---------|----------|--------|
-| arxiv-mcp-server | Search and retrieve papers from arXiv | Essential | [ ] |
+| arxiv-mcp-server | Search and retrieve papers from ArXiv | Essential | [ ] |
 | scholar-mcp-server | Google Scholar literature search | Essential | [ ] |
+| zotero-mcp-server | Reference management, personal library | Recommended | [ ] |
+| pubmed-mcp-server | Biomedical literature, clinical research | Recommended | [ ] |
 
 ### Optional MCP Servers | 可选的MCP服务器
 
 | Server | Purpose | Priority |
 |--------|---------|----------|
-| zotero-mcp-server | Reference management | Recommended |
 | crossref-mcp-server | DOI and metadata lookup | Optional |
 
 ---
@@ -272,12 +273,20 @@ Solution: Increase timeout value
 
 ---
 
-## 4. Zotero MCP Server (Optional) | Zotero MCP服务器（可选）
+## 4. Zotero MCP Server | Zotero MCP服务器
 
 ### 4.1 Installation | 安装
 
+**Method 1: pip install | 方法1：pip安装**
 ```bash
 pip install zotero-mcp-server
+```
+
+**Method 2: From source | 方法2：从源码安装**
+```bash
+git clone https://github.com/your-username/zotero-mcp-server.git
+cd zotero-mcp-server
+pip install -e .
 ```
 
 ### 4.2 Configuration | 配置
@@ -285,40 +294,208 @@ pip install zotero-mcp-server
 #### API Key Setup | API密钥设置
 
 1. Go to [zotero.org/settings/keys](https://www.zotero.org/settings/keys)
-2. Create new private key
-3. Note your User ID from settings page
+2. Create new private key with read/write permissions
+3. Note your User ID from [zotero.org/settings](https://www.zotero.org/settings)
+
+#### Claude Desktop Configuration | Claude桌面配置
+
+```json
+{
+  "mcpServers": {
+    "zotero": {
+      "command": "python",
+      "args": ["-m", "zotero_mcp_server"],
+      "env": {
+        "ZOTERO_API_KEY": "your-api-key",
+        "ZOTERO_USER_ID": "your-user-id"
+      }
+    }
+  }
+}
+```
 
 #### Environment Variables | 环境变量
 
-| Variable | Description |
-|----------|-------------|
-| ZOTERO_API_KEY | Your Zotero private key |
-| ZOTERO_USER_ID | Your Zotero user ID |
+| Variable | Description | Required |
+|----------|-------------|----------|
+| ZOTERO_API_KEY | Your Zotero private key | Yes |
+| ZOTERO_USER_ID | Your Zotero user ID | Yes |
 
 ### 4.3 Usage | 使用
 
+#### Available Tools | 可用工具
+
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| zotero_search_items | Search your Zotero library | query, limit, start |
+| zotero_get_item | Get item details | item_key |
+| zotero_get_item_fulltext | Get full text/attachment | item_key |
+| zotero_create_item | Add new item to library | item_data |
+| zotero_get_collections | List all collections | - |
+| zotero_search_collections | Search collections | query |
+
+#### Example Usage | 使用示例
+
+**Search your library | 搜索文献库**:
 ```bash
-# Search your library
-zotero_search(query: "DLC coating")
-
-# Get item details
-zotero_get_item(item_key: "XXXXXXXX")
-
-# Add new item
-zotero_add_item(item_data: {...})
+zotero_search_items(
+  query: "DLC coating friction",
+  limit: 20
+)
 ```
+
+**Get item details | 获取条目详情**:
+```bash
+zotero_get_item(item_key: "XXXXXXXX")
+```
+
+**Get full text | 获取全文**:
+```bash
+zotero_get_item_fulltext(item_key: "XXXXXXXX")
+```
+
+**Search collections | 搜索收藏夹**:
+```bash
+zotero_search_collections(query: "tribology")
+```
+
+### 4.4 Troubleshooting | 故障排除
+
+| Issue | Solution |
+|-------|----------|
+| Authentication failed | Verify API key and User ID |
+| Item not found | Check item_key format |
+| Rate limiting | Reduce request frequency |
+| Attachment access denied | Check API key permissions |
 
 ---
 
-## 5. Crossref MCP Server (Optional) | Crossref MCP服务器（可选）
+## 5. PubMed MCP Server | PubMed MCP服务器
 
 ### 5.1 Installation | 安装
+
+**Method 1: pip install | 方法1：pip安装**
+```bash
+pip install pubmed-mcp-server
+```
+
+**Method 2: From source | 方法2：从源码安装**
+```bash
+git clone https://github.com/your-username/pubmed-mcp-server.git
+cd pubmed-mcp-server
+pip install -e .
+```
+
+### 5.2 Configuration | 配置
+
+#### Claude Desktop Configuration | Claude桌面配置
+
+```json
+{
+  "mcpServers": {
+    "pubmed": {
+      "command": "python",
+      "args": ["-m", "pubmed_mcp_server"],
+      "env": {
+        "PUBMED_EMAIL": "your-email@example.com",
+        "PUBMED_API_KEY": "your-api-key (optional)"
+      }
+    }
+  }
+}
+```
+
+#### Environment Variables | 环境变量
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| PUBMED_EMAIL | Your email (NCBI requirement) | Yes |
+| PUBMED_API_KEY | NCBI API key (optional) | No |
+
+**Get NCBI API Key | 获取NCBI API密钥**:
+1. Go to [ncbi.nlm.nih.gov/account](https://www.ncbi.nlm.nih.gov/account)
+2. Navigate to "API keys" section
+3. Create new API key
+
+### 5.3 Usage | 使用
+
+#### Available Tools | 可用工具
+
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| pubmed_search_articles | Search PubMed database | query, max_results, filters |
+| pubmed_get_article_details | Get article metadata | pmid |
+| pubmed_get_fulltext | Get full text link | pmid |
+| pubmed_get_citations | Get citation count | pmid |
+| pubmed_find_similar | Find similar articles | pmid |
+
+#### Example Usage | 使用示例
+
+**Search for articles | 搜索文献**:
+```bash
+pubmed_search_articles(
+  query: "DLC coating tribology",
+  max_results: 50,
+  filters: {
+    "date_range": "2019:2024",
+    "article_type": "Review"
+  }
+)
+```
+
+**Get article details | 获取文章详情**:
+```bash
+pubmed_get_article_details(pmid: "12345678")
+```
+
+**Get full text | 获取全文链接**:
+```bash
+pubmed_get_fulltext(pmid: "12345678")
+```
+
+**Find similar articles | 查找相似文献**:
+```bash
+pubmed_find_similar(pmid: "12345678")
+```
+
+**Search with MeSH terms | 使用MeSH词搜索**:
+```bash
+pubmed_search_articles(
+  query: '"Diamond-Like Carbon"[MeSH] AND "friction"[MeSH]',
+  max_results: 30
+)
+```
+
+### 5.4 Useful MeSH Terms | 常用MeSH词
+
+| Topic | MeSH Term |
+|-------|-----------|
+| Tribology | "Friction"[MeSH], "Wear"[MeSH], "Lubrication"[MeSH] |
+| DLC | "Diamond-Like Carbon"[MeSH] |
+| Coatings | "Coated Materials, Biocompatible"[MeSH] |
+| Hardness | "Hardness"[MeSH] |
+| Materials Science | "Materials Science"[MeSH] |
+
+### 5.5 Troubleshooting | 故障排除
+
+| Issue | Solution |
+|-------|----------|
+| No results | Broaden search terms |
+| Authentication error | Verify email is correct |
+| Rate limiting | Add API key for higher limits |
+| Invalid PMID | Verify PMID format (numbers only) |
+
+---
+
+## 6. Crossref MCP Server (Optional) | Crossref MCP服务器（可选）
+
+### 6.1 Installation | 安装
 
 ```bash
 pip install crossref-mcp-server
 ```
 
-### 5.2 Usage | 使用
+### 6.2 Usage | 使用
 
 ```bash
 # Lookup DOI
@@ -330,7 +507,7 @@ crossref_search(query: "DLC coating review")
 
 ---
 
-## 6. Complete Configuration Example | 完整配置示例
+## 7. Complete Configuration Example | 完整配置示例
 
 ### claude_desktop_config.json | claude_desktop_config.json
 
@@ -361,6 +538,14 @@ crossref_search(query: "DLC coating review")
         "ZOTERO_API_KEY": "your-api-key",
         "ZOTERO_USER_ID": "your-user-id"
       }
+    },
+    "pubmed": {
+      "command": "python",
+      "args": ["-m", "pubmed_mcp_server"],
+      "env": {
+        "PUBMED_EMAIL": "your-email@example.com",
+        "PUBMED_API_KEY": "your-api-key (optional)"
+      }
     }
   }
 }
@@ -368,7 +553,7 @@ crossref_search(query: "DLC coating review")
 
 ---
 
-## 7. Verification | 验证
+## 8. Verification | 验证
 
 ### Test ArXiv Server | 测试ArXiv服务器
 
@@ -422,6 +607,61 @@ console.log(result);
 ]
 ```
 
+### Test PubMed Server | 测试PubMed服务器
+
+```javascript
+// Search for articles
+const result = await pubmed_search_articles({
+  query: "DLC coating friction",
+  max_results: 5
+});
+console.log(result);
+```
+
+**Expected output | 预期输出**:
+```
+{
+  total_count: 1234,
+  articles: [
+    {
+      pmid: "12345678",
+      title: "...",
+      authors: ["..."],
+      journal: "...",
+      year: 2023,
+      abstract: "..."
+    }
+  ]
+}
+```
+
+### Test Zotero Server | 测试Zotero服务器
+
+```javascript
+// Search library
+const result = await zotero_search_items({
+  query: "DLC coating",
+  limit: 5
+});
+console.log(result);
+```
+
+**Expected output | 预期输出**:
+```
+{
+  total_results: 50,
+  items: [
+    {
+      key: "XXXXXXXX",
+      title: "...",
+      creators: ["..."],
+      date: "2023",
+      itemType: "journalArticle"
+    }
+  ]
+}
+```
+
 ---
 
 ## 8. Security Considerations | 安全注意事项
@@ -451,6 +691,7 @@ console.log(result);
 |--------|-----------------|-------------|
 | arXiv | 1 | Use cached results |
 | Scholar | 1-3 | Add delays between requests |
+| PubMed | 3 (no key) / 10 (with key) | Add API key for higher limits |
 | Zotero | 10 | Standard use |
 
 ---

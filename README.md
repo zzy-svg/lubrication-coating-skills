@@ -81,7 +81,15 @@ npm install -g arxiv-mcp-server
 
 # Scholar MCP Server - 用于 Google Scholar 文献搜索
 # For Google Scholar literature search
-npm install -g scholar-mcp-server
+pip install scholar-mcp-server
+
+# Zotero MCP Server - 用于参考文献管理与个人文献库
+# For reference management and personal library
+pip install zotero-mcp-server
+
+# PubMed MCP Server - 用于生物医学文献搜索
+# For biomedical literature search
+pip install pubmed-mcp-server
 ```
 
 详细配置说明请参考 | See detailed setup instructions:
